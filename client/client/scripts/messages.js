@@ -23,7 +23,6 @@ var Messages = {
     if (Object.keys(Messages._data).length !== length) {
       callback(Messages.items());
     }
-    debugger;
   },
 
   _conform: function(message) {

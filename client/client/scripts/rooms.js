@@ -37,7 +37,6 @@ var Rooms = {
     if (Rooms._data.size !== length) {
       callback(Rooms.items());
     }
-    debugger;
   }
   
 };

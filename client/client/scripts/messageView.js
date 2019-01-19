@@ -9,6 +9,7 @@ var MessageView = {
           data-username="<%- username %>">
           <%- username %>
         </div>
+        <div class="roomname"> <%- roomname %> </div>
         <div><%- text %></div>
       </div>
       <!--

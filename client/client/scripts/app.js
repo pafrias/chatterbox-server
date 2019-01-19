@@ -17,19 +17,17 @@ var App = {
 
 
     // Poll for new messages every 5 sec
-    // setInterval(App.fetch, 5000);
+    setInterval(App.fetch, 5000);
       },
 
   fetch: function(callback = ()=>{}) {
     Parse.readAll((data) => {
-      console.log(data)
       var data = JSON.parse(data);
-      console.log(data);
-      
-      // Don't bother to update if we have no messages
-      if (!data.results || !data.results.length) { return; }
 
-      console.log(data.results);
+      // update server to only send new messages upon GET
+      // Don't bother to update if we have no messages
+      //if (!data.results || !data.results.length) { return; }
+
       Rooms.update(data.results, RoomsView.render);
       Messages.update(data.results, MessagesView.render);
       callback();

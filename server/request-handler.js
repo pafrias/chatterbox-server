@@ -1,11 +1,10 @@
-var _storage = []; //will need test data
+//require server storage
+
+var storage = require('./server-storage.js')
+var testStorage = new storage.Storage;
 var _validURLs = ['/classes/messages'];
 
-/*{"objectId": "dau3bsscwi","username":"John","text":"Flying Killer Robots","roomname":"solitary confinement"}, 
-        {"objectId": "dau3bsscqi","username":"John","text":"Flying Killer Robots","roomname":"solitary confinement"}, 
-        {"objectId": "da33bsscwi","username":"John","text":"Flying Killer Robots","roomname":"solitary confinement"}, 
-        {"objectId": "da13bsscwi","username":"John","text":"Flying Killer Robots","roomname":"solitary confinement"}, 
-        {"objectId": "deu3bsscwi","username":"John","text":"Flying Killer Robots","roomname":"solitary confinement"}*/
+
 var requestHandler = function(request, response) {
   
   var { method, url } = request;
@@ -16,14 +15,13 @@ var requestHandler = function(request, response) {
   var headers = defaultCorsHeaders;
   headers['Content-Type'] = 'text/plain';
   var statusCode = 200;
-  
   if (_validURLs.includes(url) || url === '/') {
     if (method === 'OPTIONS') { 
       response.writeHead(statusCode, headers);
       response.end();
     } else if (method === 'GET') { 
       response.writeHead(statusCode, headers);
-      var results = _storage;
+      var results = testStorage.retrieveAll(); //changed
       var responseBody = {results: results};
       response.end(JSON.stringify(responseBody));
     } else if (method === 'POST') {
@@ -34,12 +32,10 @@ var requestHandler = function(request, response) {
         body.push(chunk);
       }).on('end',() => {
         body = Buffer.concat(body).toString();
-        _storage.push(JSON.parse(body))
+        testStorage.add(JSON.parse(body)) //change this
       });
-      // var results = _storage;
-      // console.log(_storage);
       response.writeHead(statusCode, headers);
-      response.end(JSON.stringify(_storage));
+      response.end(JSON.stringify(testStorage.retrieveAll())); //change this
     } 
   } else {
     statusCode = 404;
