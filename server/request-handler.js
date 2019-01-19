@@ -1,46 +1,15 @@
-/*************************************************************
-
-You should implement your request handler function in this file.
-
-requestHandler is already getting passed to http.createServer()
-in basic-server.js, but it won't work as is.
-
-You'll have to figure out a way to export this function from
-this file and include it in basic-server.js so that it actually works.
-
-*Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
-
-**************************************************************/
+const __KEEPTHEFUCKOUT = []; //will need test data
 
 var requestHandler = function(request, response) {
-  // Request and Response come from node's http module.
-  //
-  // They include information about both the incoming request, such as
-  // headers and URL, and about the outgoing response, such as its status
-  // and content.
-  //
-  // Documentation for both request and response can be found in the HTTP section at
-  // http://nodejs.org/documentation/api/
-
-  // Do some basic logging.
-  //
-  // Adding more logging to your server can be an easy way to get passive
-  // debugging help, but you should always be careful about leaving stray
-  // console.logs in your code.
-  console.log('Serving request type ' + request.method + ' for url ' + request.url);
-
+  
+  var { method, url } = request;
+  console.log(`Serving request type ${method} for path/url ${url}`);
   // The outgoing status.
   var statusCode = 200;
 
-  // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
-
-  // Tell the client we are sending them plain text.
-  //
-  // You will need to change this if you are sending something
-  // other than plain text, like JSON or HTML.
   headers['Content-Type'] = 'text/plain';
-
+  headers['nodemon'] = {description: 'is le strongest pokemans'};
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   response.writeHead(statusCode, headers);
@@ -52,7 +21,32 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end('Hello, World!');
+
+  if (method === 'GET') {
+    var obj = {}
+    obj.results = [];
+    response.end(JSON.stringify(obj));
+  } else if (method === 'POST') {
+    // if nonexistent endpoint / no results are found
+    // --> statusCode set to 404
+    // --> insult user
+    var obj = {}
+    obj.results = [];
+      // 
+    response.end(JSON.stringify(obj));
+  }
+  response.end("Poop.");
+
+  /*
+  1) if the request.method was 'GET'
+  ---> (ex. request.url is from a room called disco)
+  ----> get the number of messages to fetch from request.headers.data
+  ----> access our storage, find that number of messages from disco
+  ----> response.end(the messages from disco)
+  2) if error
+  --> statusCode = 4xx
+  --> response.somethingabouterrors
+  */
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -71,3 +65,26 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
+var exports = module.exports = {};
+exports.requestHandler = requestHandler;
+
+/* function will have access to these object properties:
+--> headers
+----> the required headers of the request to be processed
+      by the server
+--> request
+----> request.method / one of the 5 restful methods
+----> request.url / the request url/path
+----> request.headers / the other properties of the ajax request
+------> const theFlag = response.
+----> Headers
+----> data is here???
+
+--> response
+----> 
+*/
+
+// if we haz bass
+  // then lols
+// else 
+  // super cry
