@@ -36,8 +36,8 @@ var requestHandler = function(request, response) {
         body = Buffer.concat(body).toString();
         _storage.push(JSON.parse(body))
       });
-      var results = _storage;
-      console.log(_storage);
+      // var results = _storage;
+      // console.log(_storage);
       response.writeHead(statusCode, headers);
       response.end(JSON.stringify(_storage));
     } 
