@@ -1,41 +1,52 @@
-const __KEEPTHEFUCKOUT = []; //will need test data
+var _storage = []; //will need test data
+var _validURLs = ['/classes/messages'];
 
+/*{"objectId": "dau3bsscwi","username":"John","text":"Flying Killer Robots","roomname":"solitary confinement"}, 
+        {"objectId": "dau3bsscqi","username":"John","text":"Flying Killer Robots","roomname":"solitary confinement"}, 
+        {"objectId": "da33bsscwi","username":"John","text":"Flying Killer Robots","roomname":"solitary confinement"}, 
+        {"objectId": "da13bsscwi","username":"John","text":"Flying Killer Robots","roomname":"solitary confinement"}, 
+        {"objectId": "deu3bsscwi","username":"John","text":"Flying Killer Robots","roomname":"solitary confinement"}*/
 var requestHandler = function(request, response) {
   
   var { method, url } = request;
-  console.log(`Serving request type ${method} for path/url ${url}`);
-  // The outgoing status.
-  var statusCode = 200;
+  console.log(`Serving request type ${method} at ${url}`);
 
-  var headers = defaultCorsHeaders;
-  headers['Content-Type'] = 'text/plain';
-  headers['nodemon'] = {description: 'is le strongest pokemans'};
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
-
-  // Make sure to always call response.end() - Node may not send
-  // anything back to the client until you do. The string you pass to
-  // response.end() will be the body of the response - i.e. what shows
-  // up in the browser.
-  //
-  // Calling .end "flushes" the response's internal buffer, forcing
-  // node to actually send all the data over to the client.
-
-  if (method === 'GET') {
-    var obj = {}
-    obj.results = [];
-    response.end(JSON.stringify(obj));
-  } else if (method === 'POST') {
-    // if nonexistent endpoint / no results are found
-    // --> statusCode set to 404
-    // --> insult user
-    var obj = {}
-    obj.results = [];
-      // 
-    response.end(JSON.stringify(obj));
+  var headers = defaultCorsHeaders;
+  headers['Content-Type'] = 'text/plain';
+  var statusCode = 200;
+  
+  if (_validURLs.includes(url) || url === '/') {
+    if (method === 'OPTIONS') { 
+      response.writeHead(statusCode, headers);
+      response.end();
+    } else if (method === 'GET') { 
+      response.writeHead(statusCode, headers);
+      var results = _storage;
+      var responseBody = {results: results};
+      response.end(JSON.stringify(responseBody));
+    } else if (method === 'POST') {
+      // catch empty url
+      statusCode = 201;
+      let body = [];
+      request.on('data', (chunk) => {
+        body.push(chunk);
+      }).on('end',() => {
+        body = Buffer.concat(body).toString();
+        _storage.push(JSON.parse(body))
+      });
+      var results = _storage;
+      console.log(_storage);
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify(_storage));
+    } 
+  } else {
+    statusCode = 404;
+    response.writeHead(statusCode, headers);
+    response.end();
   }
-  response.end("Poop.");
+  //response.end("Poop.");
 
   /*
   1) if the request.method was 'GET'

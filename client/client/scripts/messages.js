@@ -1,43 +1,37 @@
-var Messages = { 
-  _storage: [],
-  
-  newMessage: function(text, roomname) {
-    // make a new object
-    //assign user room and text keys
-    //generate a createdAt string
-    //post to server
-    //on successful post, GET from setver and display new messages
-    var message = {
-      username: App.username,
-      roomname: roomname,
-      text: text,
-      createdAt: Date.now()
-    };
-    Parse.create(message, () => {
-      // Parse.readAll(() => {
-      //   MessagesView.render();
-      window.location.reload(true);
-      //})
-    });
+var Messages = {
+
+
+  _data: {},
+
+  items: function() {
+    return _.chain(Object.values(Messages._data)).sortBy('createdAt');
   },
 
-  fetchAll: function() {
-    MessagesView.render(this._storage);
+  add: function(message, callback = ()=>{}) {
+    Messages._data[message.objectId] = message;
+    callback(Messages.items());
   },
 
-  fetchRoom: function(room) {
-    var result = [];
-    for (var message of this._storage) {
-      if (message.roomname === room) {
-        result.push(message);
-      }
+  update: function(messages, callback = ()=>{}) {
+    var length = Object.keys(Messages._data).length;
+
+    for (let message of messages) {
+      Messages._data[message.objectId] = Messages._conform(message);
     }
-    MessagesView.render(result);
+
+    // only invoke the callback if something changed
+    if (Object.keys(Messages._data).length !== length) {
+      callback(Messages.items());
+    }
+    debugger;
+  },
+
+  _conform: function(message) {
+    // ensure each message object conforms to expected shape
+    message.text = message.text || '';
+    message.username = message.username || '';
+    message.roomname = message.roomname || '';
+    return message;
   }
-  // stores local messages
   
-  // push to server
-  // fetch from server
-
-
 };
