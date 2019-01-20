@@ -1,59 +1,52 @@
 //require server storage
 
-var storage = require('./server-storage.js')
+var storage = require('./server-storage.js');
 var testStorage = new storage.Storage;
 var _validURLs = ['/classes/messages'];
 
 
 var requestHandler = function(request, response) {
-  
+
   var { method, url } = request;
   console.log(`Serving request type ${method} at ${url}`);
+  var [path, data] = url.split('?');
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   var headers = defaultCorsHeaders;
-  headers['Content-Type'] = 'text/plain';
+  headers['Content-Type'] = 'application/json';
   var statusCode = 200;
-  if (_validURLs.includes(url) || url === '/') {
+
+  if (_validURLs.includes(path) || path === '/') {
     if (method === 'OPTIONS') { 
       response.writeHead(statusCode, headers);
       response.end();
     } else if (method === 'GET') { 
       response.writeHead(statusCode, headers);
-      var results = testStorage.retrieveAll(); //changed
+      var results = testStorage.retrieveAll();
       var responseBody = {results: results};
       response.end(JSON.stringify(responseBody));
     } else if (method === 'POST') {
-      // catch empty url
       statusCode = 201;
       let body = [];
       request.on('data', (chunk) => {
         body.push(chunk);
-      }).on('end',() => {
+      }).on('end', () => {
         body = Buffer.concat(body).toString();
-        testStorage.add(JSON.parse(body)) //change this
+        var message = testStorage.add(JSON.parse(body));
+        response.writeHead(statusCode, headers);
+        response.end(JSON.stringify(message));
       });
+    } else if (method === 'DELETE') {
+      statusCode = 403;
       response.writeHead(statusCode, headers);
-      response.end(JSON.stringify(testStorage.retrieveAll())); //change this
-    } 
+      response.end();
+    }
   } else {
     statusCode = 404;
     response.writeHead(statusCode, headers);
     response.end();
   }
-  //response.end("Poop.");
-
-  /*
-  1) if the request.method was 'GET'
-  ---> (ex. request.url is from a room called disco)
-  ----> get the number of messages to fetch from request.headers.data
-  ----> access our storage, find that number of messages from disco
-  ----> response.end(the messages from disco)
-  2) if error
-  --> statusCode = 4xx
-  --> response.somethingabouterrors
-  */
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -68,30 +61,9 @@ var requestHandler = function(request, response) {
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
+  'access-control-allow-headers': 'content-type, accept, data',
   'access-control-max-age': 10 // Seconds.
 };
 
 var exports = module.exports = {};
 exports.requestHandler = requestHandler;
-
-/* function will have access to these object properties:
---> headers
-----> the required headers of the request to be processed
-      by the server
---> request
-----> request.method / one of the 5 restful methods
-----> request.url / the request url/path
-----> request.headers / the other properties of the ajax request
-------> const theFlag = response.
-----> Headers
-----> data is here???
-
---> response
-----> 
-*/
-
-// if we haz bass
-  // then lols
-// else 
-  // super cry

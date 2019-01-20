@@ -12,32 +12,34 @@ class Storage {
   }
   // Purpose: retrieve messages filtered by room.
   retrieve(room) {
-    if(this._rooms[room]) {
+    if (this._rooms[room]) {
       return this._rooms[room];
     } else {
-      throw 'It appears you have made a mistake. Lol.'
+      throw 'It appears you have made a mistake.';
     }
   }
   
   // Purpose: assign processed message to roomname
   // and add to all messages.
   add(message) {
-    if(!message.roomname || message.roomname === '') {
+    if (!message.roomname || message.roomname === '') {
       message.roomname = 'lobby';
     }
+
+    message.createdAt = Date.now();
     message.objectId = this.generateId();
     this._rooms.allRooms.push(message);
-    if(!this._rooms[message.roomname]) {
+    if (!this._rooms[message.roomname]) {
       this._rooms[message.roomname] = [message];
     } else {
       this._rooms[message.roomname].push(message);
     }     
-  
+    return message;
   }
   
   // Purpose: generate unique id.
   generateId() { 
-    var id = "";
+    var id = '';
     while (this._Ids[id] || id.length === 0) { 
       var num = Math.floor(Math.random() * 26 + 97);
       id += String.fromCharCode(num);
