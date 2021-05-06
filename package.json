@@ -33,6 +33,6 @@
   "dependencies": {
     "basic-server": "^1.0.0",
     "nodemon": "^1.18.9",
-    "underscore": "^1.9.1"
+    "underscore": "^1.12.1"
   }
 }
